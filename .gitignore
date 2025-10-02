@@ -20,6 +20,7 @@ obj/
 vendor
 Gopkg.lock
 **/.DS_Store
+*.user
 
 **/ci-scripts
 
