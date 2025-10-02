@@ -1,0 +1,21 @@
+﻿resource_groups:
+  sample-test:
+    location: Australia East
+    
+    user_assigned_identities:
+      - name: uami-sample-app
+        federated_credentials:
+          - name: github-badbort-sample-app-main-fic
+            type: github
+            entity: Branch
+            organization: badbort
+            repository: example
+            branch: main
+    
+    role_assignments:
+      - service_principle: uami-sample-app
+        roles:
+          - Key Vault Secrets User      
+    
+    tags:
+      TestTag: Hey!
