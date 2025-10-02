@@ -29,7 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\BadBort.AzureRm.Foundation\BadBort.AzureRm.Foundation.csproj" />
       <ProjectReference Include="..\BadBort.AzureRm.Foundation.Infra\BadBort.AzureRm.Foundation.Infra.csproj" />
     </ItemGroup>
 

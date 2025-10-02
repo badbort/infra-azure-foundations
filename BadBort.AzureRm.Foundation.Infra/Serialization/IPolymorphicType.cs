@@ -1,4 +1,4 @@
-﻿namespace BadBort.AzureRm.Foundation.Serialization;
+﻿namespace BadBort.AzureRm.Foundation.Infra.Serialization;
 
 public interface IPolymorphicType
 {

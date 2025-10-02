@@ -1,4 +1,4 @@
-﻿namespace BadBort.AzureRm.Foundation.Model;
+﻿namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 /// <summary>
 /// Yaml object that allows managing the creation of ad applications

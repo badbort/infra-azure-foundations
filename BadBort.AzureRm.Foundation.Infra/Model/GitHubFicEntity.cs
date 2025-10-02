@@ -1,4 +1,4 @@
-namespace BadBort.AzureRm.Foundation.Model;
+namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 public enum GitHubFicEntity
 {

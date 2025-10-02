@@ -1,11 +1,10 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BadBort.AzureRm.Foundation.Model;
+namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 public class TenantConfigFile
 {
-    [Required]
-    public required AdTenantConfig Tenant {get; init; }
+    [Required] public required AdTenantConfig Tenant { get; init; }
 }
 
 public class AdTenantConfig

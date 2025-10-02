@@ -1,5 +1,4 @@
-﻿using BadBort.AzureRm.Foundation.Serialization;
-using BadBort.Pulumi;
+﻿using BadBort.AzureRm.Foundation.Infra.Serialization;
 using Pulumi;
 using Pulumi.Azure;
 using Pulumi.Azure.ArmMsi;
@@ -14,7 +13,6 @@ public class SubscriptionStack : Stack
     public SubscriptionStack()
     {
         var config = new Config();
-        var otelHooks = new PulumiObservability(Program.ActivitySource);
         
         string dataDir = config.Require(ConfigKeys.YamlRoot);
         string tenantConfig = config.Require(ConfigKeys.Tenant);
@@ -43,7 +41,7 @@ public class SubscriptionStack : Stack
         var provider = new Provider($"az-{subscriptionInfo.Id}", new ProviderArgs
         {
             SubscriptionId = subscriptionInfo.Id,
-        }, options: otelHooks.GetOptions());
+        });
         
         foreach (var resourceInfo in subscriptionInfo.Resources)
         {

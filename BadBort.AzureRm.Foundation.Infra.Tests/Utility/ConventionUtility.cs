@@ -1,5 +1,5 @@
-﻿using BadBort.AzureRm.Foundation.Model;
-using BadBort.AzureRm.Foundation.Serialization;
+﻿using BadBort.AzureRm.Foundation.Infra.Model;
+using BadBort.AzureRm.Foundation.Infra.Serialization;
 
 namespace BadBort.AzureRm.Foundation.Infra.Tests.Utility;
 

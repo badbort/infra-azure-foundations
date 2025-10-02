@@ -1,6 +1,6 @@
-using BadBort.AzureRm.Foundation.Serialization;
+using BadBort.AzureRm.Foundation.Infra.Serialization;
 
-namespace BadBort.AzureRm.Foundation.Model;
+namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 public class FederatedCredential : IPolymorphicType
 {

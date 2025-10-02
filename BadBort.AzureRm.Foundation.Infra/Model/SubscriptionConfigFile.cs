@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace BadBort.AzureRm.Foundation.Model;
+namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 public class SubscriptionConfigFile
 {

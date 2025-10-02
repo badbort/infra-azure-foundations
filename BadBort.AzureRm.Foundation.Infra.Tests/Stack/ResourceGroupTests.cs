@@ -1,7 +1,6 @@
 ﻿using System.Collections.Immutable;
 using System.Text.Json;
 using BadBort.AzureRm.Foundation.Infra.Tests.Utility;
-using BadBort.Pulumi;
 using Pulumi;
 using Pulumi.Azure.Core;
 using Pulumi.Testing;
@@ -36,8 +35,7 @@ resource_groups:
         var envJson = JsonSerializer.Serialize(cfg);
         Environment.SetEnvironmentVariable("PULUMI_CONFIG", envJson);
 
-        // ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
-        ImmutableArray<Resource> resources = await TestUtility.TestAsync<SubscriptionStack>(new EmptyMocks());
+        ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         
         resources.ShouldNotBeEmpty();
         

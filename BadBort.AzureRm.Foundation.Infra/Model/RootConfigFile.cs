@@ -1,8 +1,7 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
-namespace BadBort.AzureRm.Foundation.Model;
+namespace BadBort.AzureRm.Foundation.Infra.Model;
 
 public class RootConfigFile
 {

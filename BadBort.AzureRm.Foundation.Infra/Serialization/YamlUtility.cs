@@ -1,11 +1,10 @@
-﻿using System.Diagnostics;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Text;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.BufferedDeserialization.TypeDiscriminators;
 using YamlDotNet.Serialization.NamingConventions;
 
-namespace BadBort.AzureRm.Foundation.Serialization;
+namespace BadBort.AzureRm.Foundation.Infra.Serialization;
 
 public static class YamlUtility
 {

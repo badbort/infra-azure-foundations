@@ -1,6 +1,6 @@
-﻿using BadBort.AzureRm.Foundation.Model;
+﻿using BadBort.AzureRm.Foundation.Infra.Model;
 
-namespace BadBort.AzureRm.Foundation.Serialization;
+namespace BadBort.AzureRm.Foundation.Infra.Serialization;
 
 public class FileSystemConvention
 {
