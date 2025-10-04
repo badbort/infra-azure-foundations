@@ -34,25 +34,6 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
           
-#      - name: Retrieve passphrase from Key Vault
-#        id: keyvault
-#        uses: azure/acli@v2
-#        with:
-#          azcliversion: latest
-#          inlineScript: |
-#            secretValue=$(az keyvault secret show --name "infra-azure-foundations-stack-adi-tenant" --vault-name "kv-badbort-pulumi-pw" --query value -o tsv)
-#            echo "::add-mask::$secretValue"
-#            echo "PULUMI_CONFIG_PASSPHRASE=$secretValue" >> $GITHUB_ENV
-          
-      - name: Pulumi login to azblob backend (Tenant A)
-        run: pulumi login "azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}"
-        working-directory: ${{ env.WORK_DIR }}
-
-      - name: Pulumi Stack Init
-        run: |
-          pulumi stack select --stack ${{ env.PULUMI_STACK }} --create --secrets-provider azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
-        working-directory: ${{ env.WORK_DIR }}
-          
       - uses: pulumi/actions@v6
         with:
           command: preview
@@ -65,5 +46,8 @@ jobs:
               value: adi
           comment-on-pr: true
           comment-on-summary: true
+          diff: true
+          upsert: true
+          secrets-provider: azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ env.PULUMI_CONFIG_PASSPHRASE }}
