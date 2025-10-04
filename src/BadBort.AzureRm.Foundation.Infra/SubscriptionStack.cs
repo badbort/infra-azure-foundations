@@ -44,6 +44,7 @@ public class SubscriptionStack : Stack
         var subscriptionProviders = subscriptions.ToDictionary(s => s, s => new Provider($"az-{s.Id}", new ProviderArgs
         {
             SubscriptionId = s.Id,
+            UseOidc = true,
         }));
 
         // Resource groups and UAMIs first
