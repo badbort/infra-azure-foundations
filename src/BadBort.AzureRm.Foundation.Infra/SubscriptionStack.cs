@@ -67,7 +67,9 @@ public class SubscriptionStack : Stack
         {
             foreach (var (resourceGroupName, resourceGroupConfig) in resourceInfo.Config.ResourceGroups ?? new())
             {
-                var rg = new ResourceGroup(resourceGroupName, new ResourceGroupArgs
+                var id = $"{subscriptionInfo.Id}-{resourceGroupName}";
+                
+                var rg = new ResourceGroup(id, new ResourceGroupArgs
                 {
                     Name = resourceGroupName,
                     Location = resourceGroupConfig.Location!,

@@ -14,6 +14,13 @@ public static class TestExtensions
         return builder;
     }
     
+    public static FileSystemConventionBuilder SetupRandomSubscription(this FileSystemConventionBuilder builder)
+    {
+        builder.SetupSubscription(Guid.NewGuid().ToString("D"), GenerateSubscriptionName());
+        
+        return builder;
+    }
+    
     public static string GenerateTenantName()
     {
         // Combines a fake company name and a short domain-style suffix
