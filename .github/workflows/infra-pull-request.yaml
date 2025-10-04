@@ -37,8 +37,10 @@ jobs:
       - uses: pulumi/actions@v6
         with:
           command: preview
-          stack-name: ${{ env.PULUMI_STACK }}
           work-dir: ${{ env.WORK_DIR }}
+          stack-name: ${{ env.PULUMI_STACK }}
+          cloud-url: azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}
+          secrets-provider: azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
           config-map: |
             data_dir: 
               value: ${{ github.workspace }}/data
@@ -48,6 +50,5 @@ jobs:
           comment-on-summary: true
           diff: true
           upsert: true
-          secrets-provider: azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
         env:
           PULUMI_CONFIG_PASSPHRASE: ${{ env.PULUMI_CONFIG_PASSPHRASE }}
