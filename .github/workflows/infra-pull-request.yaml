@@ -16,6 +16,7 @@ jobs:
     environment: infra
     env:
       WORK_DIR: ./src/BadBort.AzureRm.Foundation.Infra
+      PULUMI_STACK: adi-tenant
     steps:
       - run: |
           echo "backend container name: ${{vars.BACKEND_CONTAINER_NAME}}"
@@ -33,22 +34,33 @@ jobs:
           tenant-id: ${{ secrets.AZURE_TENANT_ID }}
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
           
+#      - name: Retrieve passphrase from Key Vault
+#        id: keyvault
+#        uses: azure/acli@v2
+#        with:
+#          azcliversion: latest
+#          inlineScript: |
+#            secretValue=$(az keyvault secret show --name "infra-azure-foundations-stack-adi-tenant" --vault-name "kv-badbort-pulumi-pw" --query value -o tsv)
+#            echo "::add-mask::$secretValue"
+#            echo "PULUMI_CONFIG_PASSPHRASE=$secretValue" >> $GITHUB_ENV
+          
       - name: Pulumi login to azblob backend (Tenant A)
         run: pulumi login "azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}"
         working-directory: ${{ env.WORK_DIR }}
+
+      - name: Pulumi Stack Init
+        run: |
+          pulumi stack select --stack ${{ env.PULUMI_STACK }} --create --secrets-provider azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/test
           
       - uses: pulumi/actions@v6
         with:
           command: preview
-          stack-name: az-subscription-foundations
+          stack-name: ${{ env.PULUMI_STACK }}
           work-dir: ${{ env.WORK_DIR }}
           config-map: |
-            data_dir: data
+            data_dir: ${{ github.workspace }}/data
             tenant: adi
-            
           comment-on-pr: true
           comment-on-summary: true
-#          cloud-url: azblob://my-blob-name-and-path
-        #env:
-          #PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          #PULUMI_BACKEND_URL: ${{ secrets.PULUMI_BACKEND_URL }}
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ env.PULUMI_CONFIG_PASSPHRASE }}

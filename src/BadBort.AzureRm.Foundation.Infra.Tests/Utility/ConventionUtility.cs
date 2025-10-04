@@ -10,7 +10,17 @@ public class ConventionUtility
 public sealed class TempData : IDisposable
 {
     public string Root { get; } = Path.Combine(Path.GetTempPath(), "pulumi-it", Guid.NewGuid().ToString("N"));
+    
 
+    public void WriteTenantAndSubscription(string tenantAlias, string tenantId, string subscriptionAlias, string subscriptionId)
+    {
+        WriteSubscription(subscriptionAlias, subscriptionId);
+    }
+
+    public void WriteSubscription(string subscriptionAlias, string subscriptionId)
+    {
+    }
+    
     public void WriteTenantAndSubscription(
         string tenantAlias,
         string tenantId,
