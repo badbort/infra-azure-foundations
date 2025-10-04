@@ -48,11 +48,11 @@ jobs:
 
       - name: Build (no restore)
         working-directory: ${{ env.WORK_DIR }}
-        run: dotnet build --no-build --no-restore -c Debug
+        run: dotnet build --no-restore -c Debug
 
       - name: dotnet test with coverage
         working-directory: ${{ env.WORK_DIR }}
-        run: dotnet test --logger trx --configuration Release
+        run: dotnet test --no-build --logger trx --configuration Release
 
       - name: Process trx reports with default
         if: always()
