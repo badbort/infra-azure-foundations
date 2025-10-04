@@ -34,7 +34,7 @@ jobs:
           subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
           
       - name: Pulumi login to azblob backend (Tenant A)
-        run: pulumi login "azblob://${{ env.BACKEND_CONTAINER_NAME }}?storage_account=${{ env.BACKEND_STORAGE_ACCOUNT }}"
+        run: pulumi login "azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}"
         working-directory: ${{ env.WORK_DIR }}
           
       - uses: pulumi/actions@v6
