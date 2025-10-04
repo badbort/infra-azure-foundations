@@ -17,6 +17,9 @@ jobs:
     env:
       WORK_DIR: ./src/BadBort.AzureRm.Foundation.Infra
     steps:
+      - run: |
+          echo ${{vars.BACKEND_CONTAINER_NAME}}
+          
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
