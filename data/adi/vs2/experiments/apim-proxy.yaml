@@ -1,0 +1,11 @@
+﻿resource_groups:
+  apim-proxy-test:
+    location: Australia East
+    user_assigned_identities:
+      - name: apim-uami-2
+    
+    role_assignments:
+      - service_principal: github-actions-apim-proxy-test
+        roles:
+          - Contributor
+          - User Access Administrator
