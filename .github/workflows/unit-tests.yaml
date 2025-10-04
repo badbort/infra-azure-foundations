@@ -1,0 +1,71 @@
+﻿name: .NET Tests
+
+on:
+  pull_request:
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "**/*.csproj"
+      - "**/*.sln"
+  push:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+concurrency:
+  group: dotnet-tests-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            ${{ runner.os }}-nuget
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build (no restore)
+        run: dotnet build --no-build --no-restore -c Debug
+
+      - name: dotnet test with coverage
+        run: dotnet test './src/MyProj.sln' --logger trx --configuration Release
+
+      - name: Process trx reports with default
+        if: always()
+        uses: im-open/process-dotnet-test-results@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          create-status-check: true
+          create-pr-comment: true
+          update-comment-if-one-exists: true
+          
+      - name: Annotate Test Outcome
+        if: steps.process-trx.outputs.test-results-truncated == 'true'
+        run: cat ${{ steps.process-trx.outputs.test-results-file-path }} > $GITHUB_STEP_SUMMARY
+
+      - name: Upload Outcome as artifact if character limit reached
+        if: steps.process-trx.outputs.test-results-truncated == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: Cypress-Results
+          path: |
+            ${{ steps.process-trx.outputs.test-results-file-path }}
+          retention-days: 7
