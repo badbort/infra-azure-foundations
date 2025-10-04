@@ -22,7 +22,7 @@ resource_groups:
             branch: main
     
     role_assignments:
-      - service_principle: uami-sample-app
+      - service_principal: uami-sample-app
         roles:
           - Key Vault Secrets User
 ";
