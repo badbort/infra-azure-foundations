@@ -52,7 +52,7 @@ jobs:
 
       - name: dotnet test with coverage
         working-directory: ${{ env.WORK_DIR }}
-        run: dotnet test --no-build --logger trx --configuration Release
+        run: dotnet test **/*Tests.csproj --no-build --logger trx --configuration Release
 
       - name: Process trx reports with default
         if: always()
