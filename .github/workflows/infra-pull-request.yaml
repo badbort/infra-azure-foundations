@@ -51,6 +51,7 @@ jobs:
       - name: Pulumi Stack Init
         run: |
           pulumi stack select --stack ${{ env.PULUMI_STACK }} --create --secrets-provider azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/test
+        working-directory: ${{ env.WORK_DIR }}
           
       - uses: pulumi/actions@v6
         with:
