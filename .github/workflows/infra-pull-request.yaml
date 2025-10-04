@@ -41,6 +41,7 @@ jobs:
         with:
           command: preview
           stack-name: az-subscription-foundations
+          work-dir: ${{ env.WORK_DIR }}
           config-map: |
             data_dir: data
             tenant: adi
