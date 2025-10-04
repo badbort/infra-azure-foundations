@@ -59,8 +59,10 @@ jobs:
           stack-name: ${{ env.PULUMI_STACK }}
           work-dir: ${{ env.WORK_DIR }}
           config-map: |
-            data_dir: ${{ github.workspace }}/data
-            tenant: adi
+            data_dir: 
+              value: ${{ github.workspace }}/data
+            tenant: 
+              value: adi
           comment-on-pr: true
           comment-on-summary: true
         env:
