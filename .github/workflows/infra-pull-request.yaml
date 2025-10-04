@@ -50,7 +50,7 @@ jobs:
 
       - name: Pulumi Stack Init
         run: |
-          pulumi stack select --stack ${{ env.PULUMI_STACK }} --create --secrets-provider azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/test
+          pulumi stack select --stack ${{ env.PULUMI_STACK }} --create --secrets-provider azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
         working-directory: ${{ env.WORK_DIR }}
           
       - uses: pulumi/actions@v6
