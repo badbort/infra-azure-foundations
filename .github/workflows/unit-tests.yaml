@@ -19,6 +19,9 @@ concurrency:
   group: dotnet-tests-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  WORK_DIR: ./src/BadBort.AzureRm.Foundation.Infra
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -40,13 +43,16 @@ jobs:
             ${{ runner.os }}-nuget
 
       - name: Restore
+        working-directory: ${{ env.WORK_DIR }}
         run: dotnet restore
 
       - name: Build (no restore)
+        working-directory: ${{ env.WORK_DIR }}
         run: dotnet build --no-build --no-restore -c Debug
 
       - name: dotnet test with coverage
-        run: dotnet test 'src/BadBort.AzureRm.Foundation.sln' --logger trx --configuration Release
+        working-directory: ${{ env.WORK_DIR }}
+        run: dotnet test --logger trx --configuration Release
 
       - name: Process trx reports with default
         if: always()
