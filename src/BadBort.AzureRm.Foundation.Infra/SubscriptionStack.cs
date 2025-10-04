@@ -77,11 +77,11 @@ public class SubscriptionStack : Stack
                     Tags = resourceGroupConfig.Tags ?? new InputMap<string>() // if your model includes Tags
                 }, new CustomResourceOptions
                 {
-                    Provider = azureProvider
+                    Provider = azureProvider,
+                    Parent = azureProvider
                 });
 
                 _resourceGroups[new(subscriptionInfo, resourceGroupName)] = rg;
-
 
                 foreach (var userAssignedIdentity in resourceGroupConfig.UserAssignedIdentities ?? new())
                 {
@@ -188,7 +188,7 @@ public class SubscriptionStack : Stack
             // Subscription level role assignments
             foreach (RoleAssignment assignment in resourceInfo.Config.RoleAssignments ?? new())
             {
-                RoleAssignment(assignment, "subscription-" + subscriptionInfo.Alias, subscriptionInfo.Id, null, azureProvider);
+                RoleAssignment(assignment, "subscription-" + subscriptionInfo.Alias, subscriptionInfo.Id, azureProvider, azureProvider);
             }
         }
     }

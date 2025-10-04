@@ -1,6 +1,7 @@
 ﻿using System.Collections.Immutable;
 using BadBort.AzureRm.Foundation.Infra.Tests.Utility;
 using Pulumi;
+using Pulumi.Azure;
 using Pulumi.Azure.Core;
 using Pulumi.Testing;
 using Shouldly;
@@ -34,6 +35,9 @@ resource_groups:
         ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         resources.ShouldNotBeEmpty();
 
+        var azureProviders = resources.OfType<Provider>().ToList();
+        azureProviders.Count.ShouldBe(2);
+        
         var resourceGroups = resources.OfType<ResourceGroup>().ToList();
         resourceGroups.Count.ShouldBe(2);
 
