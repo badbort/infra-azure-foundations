@@ -1,7 +1,9 @@
 ﻿name: Pulumi Preview
 
 on:
-  - pull_request
+  pull_request:
+  push:
+    branches: [ main ]
   
 permissions:
   id-token: write
@@ -13,7 +15,7 @@ jobs:
   preview:
     name: Preview
     runs-on: ubuntu-latest
-    environment: infra
+    environment: ${{ github.event_name == 'pull_request' && 'preview' || 'infra' }}
     env:
       WORK_DIR: ./src/BadBort.AzureRm.Foundation.Infra
       PULUMI_STACK: adi-tenant
@@ -36,7 +38,7 @@ jobs:
           
       - uses: pulumi/actions@v6
         with:
-          command: preview
+          command: ${{ github.event_name == 'pull_request' && 'preview' || 'up' }}
           work-dir: ${{ env.WORK_DIR }}
           stack-name: ${{ env.PULUMI_STACK }}
           cloud-url: azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}
