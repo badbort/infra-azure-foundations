@@ -1,8 +1,4 @@
-﻿common:
-  template-group: &rg
-    location: Australia East
-
-resource_groups:
+﻿resource_groups:
   sample-test:
     location: Australia East
     
@@ -10,7 +6,7 @@ resource_groups:
       - name: uami-sample-app
             
       - name: github-actions-testasdfasdfasdf
-        managed_idenity_operators:
+        managed_identity_operators:
           - service_principal: uami-sample-app
             description: Needed to assign roles to a UAMI that exists in another resource group
         federated_credentials:
@@ -29,14 +25,25 @@ resource_groups:
     tags:
       TestTag: Hey!
       
-  sample-test-2: *rg
-  sample-test-3: *rg
-  sample-test-4: *rg
-  sample-test-5: *rg
-  sample-test-6: *rg
-  sample-test-7: *rg
-  sample-test-8: *rg
-  sample-test-9: *rg
-  sample-test-10: *rg
-  sample-test-11: *rg
-  sample-test-12: *rg
+  sample-test-2: &rg
+    location: Australia East
+  sample-test-3: 
+    <<: *rg
+  sample-test-4: 
+    <<: *rg
+  sample-test-5: 
+    <<: *rg
+  sample-test-6: 
+    <<: *rg
+  sample-test-7: 
+    <<: *rg
+  sample-test-8: 
+    <<: *rg
+  sample-test-9: 
+    <<: *rg
+  sample-test-10: 
+    <<: *rg
+  sample-test-11: 
+    <<: *rg
+  sample-test-12: 
+    <<: *rg

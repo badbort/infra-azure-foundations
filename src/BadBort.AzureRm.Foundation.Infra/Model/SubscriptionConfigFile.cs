@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.DataAnnotations;
+using System.Dynamic;
 using JetBrains.Annotations;
 
 namespace BadBort.AzureRm.Foundation.Infra.Model;
@@ -32,7 +33,7 @@ public class RoleAssignment
 {
     public string? Group { get; set; }
     
-    public string? ServicePrinciple { get; set; }
+    public string? ServicePrincipal { get; set; }
     
     [Required]
     public List<string>? Roles { get; set; }
@@ -46,8 +47,8 @@ public class RoleAssignment
     {
         if(!string.IsNullOrEmpty(Group))
             return new (IdentityType.Group, Group);
-        if(!string.IsNullOrEmpty(ServicePrinciple))
-            return new (IdentityType.ServicePrincipal,  ServicePrinciple);
+        if(!string.IsNullOrEmpty(ServicePrincipal))
+            return new (IdentityType.ServicePrincipal,  ServicePrincipal);
         return null;
     }
 }

@@ -212,9 +212,9 @@ public class SubscriptionStack : Stack
             return;
         }
 
-        if (assignment.ServicePrinciple != null)
+        if (assignment.ServicePrincipal != null)
         {
-            principalId = GetServicePrincipleId(assignment.ServicePrinciple);
+            principalId = GetServicePrincipleId(assignment.ServicePrincipal);
         }
         else if (assignment.Group != null)
         {
