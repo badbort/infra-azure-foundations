@@ -17,6 +17,8 @@ public class SubscriptionStack : Stack
         string dataDir = config.Require(ConfigKeys.YamlRoot);
         string tenantConfig = config.Require(ConfigKeys.Tenant);
 
+        Log.Info($"Loading data directory {dataDir}, full path: {Path.GetFullPath(dataDir)}");
+
         var dirContext = new FileSystemConvention(dataDir);
 
         var tenantInfo = dirContext.GetTenants().FirstOrDefault(t => t.Id == tenantConfig || t.Alias == tenantConfig);
