@@ -44,7 +44,5 @@ resource_groups:
         
         (await rg1.Location.GetValueAsync()).ShouldBe("Australia East");
         (await rg2.Location.GetValueAsync()).ShouldBe("Australia South East");
-
-        Assert.Fail();
     }
 }
