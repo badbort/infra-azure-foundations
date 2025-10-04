@@ -32,7 +32,7 @@ public class FileSystemConvention
 
         var rootCfg = YamlUtility.DeserializeFromFile<RootConfigFile>(cfgFilePath);
 
-        if (rootCfg.TenantAliases == null)
+        if (rootCfg?.TenantAliases == null)
             return tenants;
 
         foreach (var (tenantAlias, tid) in rootCfg.TenantAliases)
@@ -45,6 +45,9 @@ public class FileSystemConvention
 
             var tenantCfg = YamlUtility.DeserializeFromFile<TenantConfigFile>(tenantInfoPath);
 
+            if (tenantCfg == null)
+                continue;
+            
             var tenantInfo = new TenantInfo
             {
                 Alias = tenantAlias,
