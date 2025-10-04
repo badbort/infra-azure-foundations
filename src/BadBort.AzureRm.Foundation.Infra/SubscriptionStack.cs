@@ -12,6 +12,9 @@ using RoleAssignment = BadBort.AzureRm.Foundation.Infra.Model.RoleAssignment;
 
 namespace BadBort.AzureRm.Foundation.Infra;
 
+/// <summary>
+/// Manages resource groups, user assigned identities and role assignments within a tenant across multiple subscriptions.
+/// </summary>
 public class SubscriptionStack : Stack
 {
     private readonly Dictionary<string, UserAssignedIdentity> _uamiLookup = new(StringComparer.InvariantCultureIgnoreCase);
@@ -36,7 +39,7 @@ public class SubscriptionStack : Stack
         }
 
         var subscriptions = dirContext.GetSubscriptions(tenantInfo);
-        Log.Info($"Executing for subscription {tenantInfo.Id} with alias {tenantInfo.Alias} with {subscriptions.Count} subscriptions");
+        Log.Info($"Executing for tenant {tenantInfo.Id} with alias {tenantInfo.Alias}. Located {subscriptions.Count} subscriptions");
 
         var subscriptionProviders = subscriptions.ToDictionary(s => s, s => new Provider($"az-{s.Id}", new ProviderArgs
         {
@@ -220,7 +223,7 @@ public class SubscriptionStack : Stack
         foreach (string role in assignment.Roles ?? new())
         {
             _ = new Assignment(
-                name: $"ra-{scopeName}-{identityInfo.IdentityType}-{identityInfo.Name}-{role}".ToLower(),
+                name: $"ra-{scopeName}-{identityInfo.IdentityType}-{identityInfo.Name}-{role.Replace(" ", "-")}".ToLower(),
                 new AssignmentArgs
                 {
                     PrincipalId = principalId,

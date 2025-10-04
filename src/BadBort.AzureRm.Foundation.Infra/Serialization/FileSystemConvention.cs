@@ -15,11 +15,21 @@ public class FileSystemConvention
     
     public string GetRootConfigFile() => Path.Combine(Root.FullName, TenantsFile);
 
-    public string GetTenantDirectory(string tenantAlias) => Path.Combine(Root.FullName, tenantAlias);
-
-    public string GetSubscriptionDirectory(string tenantAlias, string subscriptionAlias) => Path.Combine(Root.FullName, tenantAlias, subscriptionAlias);
+    public string GetTenantDirectory(string tenantAlias) => GetTenantDirectory(Root.FullName, tenantAlias);
     
-    public string GetResourceGroupDirectory(string tenantAlias, string subscriptionAlias, string subPath) => Path.Combine(Root.FullName, tenantAlias, subscriptionAlias, subPath);
+    public static string GetTenantDirectory(string dataDir, string tenantAlias) => Path.Combine(dataDir, tenantAlias);
+
+    public string GetSubscriptionDirectory(string tenantAlias, string subscriptionAlias) => GetSubscriptionDirectory(Root.FullName, tenantAlias, subscriptionAlias);
+    
+    public static string GetSubscriptionDirectory(string dataDir, string tenantAlias, string subscriptionAlias) => Path.Combine(dataDir, tenantAlias, subscriptionAlias);
+    
+    public static string GetResourceGroupDirectory(string dataDir, string tenantAlias, string subscriptionAlias, string? subPath = null)
+    {
+        if (subPath == null)
+            return Path.Combine(dataDir, tenantAlias, subscriptionAlias);
+        
+        return Path.Combine(dataDir, tenantAlias, subscriptionAlias, subPath);
+    }
 
     public List<TenantInfo> GetTenants()
     {
