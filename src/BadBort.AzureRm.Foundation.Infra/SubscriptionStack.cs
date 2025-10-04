@@ -4,6 +4,7 @@ using Pulumi;
 using Pulumi.Azure.ArmMsi;
 using Pulumi.Azure.Authorization;
 using Pulumi.Azure.Core;
+using Pulumi.Azure.Inputs;
 using Pulumi.AzureAD;
 using Config = Pulumi.Config;
 using Provider = Pulumi.Azure.Provider;
@@ -45,6 +46,13 @@ public class SubscriptionStack : Stack
         {
             SubscriptionId = s.Id,
             UseOidc = true,
+            Features = new ProviderFeaturesArgs
+            {
+                ResourceGroup = new ProviderFeaturesResourceGroupArgs
+                {
+                    PreventDeletionIfContainsResources = true
+                }
+            }
         }));
 
         // Resource groups and UAMIs first
