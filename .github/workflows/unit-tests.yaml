@@ -63,7 +63,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           create-status-check: true
           create-pr-comment: true
-          update-comment-if-one-exists: true
+          update-comment-if-one-exists: false
           
       - name: Annotate Test Outcome
         if: steps.process-trx.outputs.test-results-truncated == 'true'
