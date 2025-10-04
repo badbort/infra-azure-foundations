@@ -22,7 +22,7 @@ resource_groups:
             branch: main
     
     role_assignments:
-      - service_principle: uami-sample-app
+      - service_principal: uami-sample-app
         roles:
           - Key Vault Secrets User
 ";
@@ -71,7 +71,7 @@ resource_groups:
         rg.RoleAssignments!.Count.ShouldBe(1);
         var ra = rg.RoleAssignments.Single();
         ra.Group.ShouldBeNull();
-        ra.ServicePrinciple.ShouldBe("uami-sample-app");
+        ra.ServicePrincipal.ShouldBe("uami-sample-app");
         ra.Roles.ShouldNotBeNull();
         ra.Roles.ShouldContain("Key Vault Secrets User");
     }
@@ -124,7 +124,7 @@ resource_groups:
   rg-app:
     location: Australia East
     role_assignments:
-      - service_principle: uami-app
+      - service_principal: uami-app
         roles:
           - Contributor
           - Key Vault Secrets User
@@ -133,7 +133,7 @@ resource_groups:
 
         cfg.ShouldNotBeNull();
         var rgRa = cfg.ResourceGroups!["rg-app"].RoleAssignments.ShouldNotBeNull().Single();
-        rgRa.ServicePrinciple.ShouldBe("uami-app");
+        rgRa.ServicePrincipal.ShouldBe("uami-app");
         rgRa.Roles.ShouldBe(["Contributor", "Key Vault Secrets User"], true);
     }
 

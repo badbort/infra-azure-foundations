@@ -1,5 +1,6 @@
 ﻿using System.Reflection;
 using System.Text;
+using YamlDotNet.Core;
 using YamlDotNet.Serialization;
 using YamlDotNet.Serialization.BufferedDeserialization.TypeDiscriminators;
 using YamlDotNet.Serialization.NamingConventions;
@@ -69,19 +70,7 @@ public static class YamlUtility
     {
         var config = GetConfiguration(null, configure, ignoreUnmatchedProperties);
         var deserializer = config.DeserializerBuilder.Build();
-        return deserializer.Deserialize<T>(yaml);
-    }
-
-    public static T? Deserialize<T>(
-        Stream input,
-        Action<DeserializerBuilder>? configure = null,
-        bool ignoreUnmatchedProperties = true,
-        Encoding? encoding = null)
-    {
-        encoding ??= Encoding.UTF8;
-        using var reader = new StreamReader(input, encoding, detectEncodingFromByteOrderMarks: true, leaveOpen: true);
-        var yaml = reader.ReadToEnd();
-        return Deserialize<T>(yaml, configure, ignoreUnmatchedProperties);
+        return deserializer.Deserialize<T>(GetMergingParser(yaml));
     }
 
     public static T? DeserializeFromFile<T>(
@@ -94,30 +83,11 @@ public static class YamlUtility
         var yaml = File.ReadAllText(path, encoding);
         return Deserialize<T>(yaml, configure, ignoreUnmatchedProperties);
     }
+    
 
-    public static async Task SerializeToFileAsync<T>(
-        string path,
-        T value,
-        Action<SerializerBuilder>? configure = null,
-        Encoding? encoding = null,
-        CancellationToken cancellationToken = default)
+    private static IParser GetMergingParser(string yamlInput)
     {
-        encoding ??= new UTF8Encoding(false);
-        Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-        var text = Serialize(value, configure);
-        await File.WriteAllTextAsync(path, text, encoding, cancellationToken).ConfigureAwait(false);
-    }
-
-    public static async Task<T?> DeserializeFromFileAsync<T>(
-        string path,
-        Action<DeserializerBuilder>? configure = null,
-        bool ignoreUnmatchedProperties = true,
-        Encoding? encoding = null,
-        CancellationToken cancellationToken = default)
-    {
-        encoding ??= Encoding.UTF8;
-        var yaml = await File.ReadAllTextAsync(path, encoding, cancellationToken).ConfigureAwait(false);
-        return Deserialize<T>(yaml, configure, ignoreUnmatchedProperties);
+        return new MergingParser(new Parser(new StringReader(yamlInput)));
     }
 
     private static (SerializerBuilder Serializer, DeserializerBuilder Deserializer) CreateDefaultBuilders(bool ignoreUnmatchedProperties)
@@ -125,7 +95,9 @@ public static class YamlUtility
         var ser = new SerializerBuilder()
             .WithNamingConvention(UnderscoredNamingConvention.Instance);
 
+        
         var de = new DeserializerBuilder()
+            
             .WithNamingConvention(UnderscoredNamingConvention.Instance);
 
         if (ignoreUnmatchedProperties)

@@ -171,7 +171,7 @@ public class SubscriptionStack : Stack
                             continue;
                         }
 
-                        var principalId = GetServicePrincipleId(roleAssignment.ServicePrincipal);
+                        var principalId = GetServicePrincipalId(roleAssignment.ServicePrincipal);
 
                         _ = new Assignment(
                             name: $"ra-uami-{identityInfo.IdentityType}-{identityInfo.Name}-managed-identity-operator".ToLower(),
@@ -212,9 +212,9 @@ public class SubscriptionStack : Stack
             return;
         }
 
-        if (assignment.ServicePrinciple != null)
+        if (assignment.ServicePrincipal != null)
         {
-            principalId = GetServicePrincipleId(assignment.ServicePrinciple);
+            principalId = GetServicePrincipalId(assignment.ServicePrincipal);
         }
         else if (assignment.Group != null)
         {
@@ -252,7 +252,7 @@ public class SubscriptionStack : Stack
         }
     }
 
-    private Output<string> GetServicePrincipleId(string servicePrincipalName)
+    private Output<string> GetServicePrincipalId(string servicePrincipalName)
     {
         if (_uamiLookup.TryGetValue(servicePrincipalName, out var userAssignedIdentity))
         {

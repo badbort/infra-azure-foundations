@@ -6,7 +6,7 @@
       - name: uami-sample-app
             
       - name: github-actions-testasdfasdfasdf
-        managed_idenity_operators:
+        managed_identity_operators:
           - service_principal: uami-sample-app
             description: Needed to assign roles to a UAMI that exists in another resource group
         federated_credentials:
