@@ -3,14 +3,6 @@
     location: Australia East
     user_assigned_identities:
       - name: apim-uami-1
-      - name: github-actions-apim-proxy-test
-        federated_credentials:
-          - name: github-main-fic
-            type: github
-            entity: Branch
-            organization: badbort
-            repository: example
-            branch: main
     
     role_assignments:
       - service_principal: github-actions-apim-proxy-test
