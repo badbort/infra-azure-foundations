@@ -72,6 +72,7 @@ resource_groups:
         var ra = rg.RoleAssignments.Single();
         ra.Group.ShouldBeNull();
         ra.ServicePrinciple.ShouldBe("uami-sample-app");
+        ra.Roles.ShouldNotBeNull();
         ra.Roles.ShouldContain("Key Vault Secrets User");
     }
 
@@ -85,6 +86,7 @@ resource_groups:
 ";
         var cfg = YamlUtility.Deserialize<SubscriptionConfigFile>(yaml);
 
+        cfg.ShouldNotBeNull();
         cfg.ResourceGroups.ShouldNotBeNull();
         cfg.ResourceGroups!.ContainsKey("rg-empty").ShouldBeTrue();
 
@@ -107,6 +109,7 @@ resource_groups:
 ";
         var cfg = YamlUtility.Deserialize<SubscriptionConfigFile>(yaml);
 
+        cfg.ShouldNotBeNull();
         cfg.ResourceGroups.ShouldNotBeNull();
         cfg.ResourceGroups.Keys.ShouldBe(["rg-one", "rg-two"], true);
         cfg.ResourceGroups["rg-one"].Location.ShouldBe("Australia East");
@@ -128,6 +131,7 @@ resource_groups:
 ";
         var cfg = YamlUtility.Deserialize<SubscriptionConfigFile>(yaml);
 
+        cfg.ShouldNotBeNull();
         var rgRa = cfg.ResourceGroups!["rg-app"].RoleAssignments.ShouldNotBeNull().Single();
         rgRa.ServicePrinciple.ShouldBe("uami-app");
         rgRa.Roles.ShouldBe(["Contributor", "Key Vault Secrets User"], true);
@@ -152,7 +156,7 @@ resource_groups:
 ";
         var cfg = YamlUtility.Deserialize<SubscriptionConfigFile>(yaml);
 
-        var federatedCredential = cfg.ResourceGroups!["sample-rg"]
+        var federatedCredential = cfg?.ResourceGroups!["sample-rg"]
             .UserAssignedIdentities!.Single()
             .FederatedCredentials!.Single();
         

@@ -53,10 +53,8 @@ public class GitHubFederatedCredential : FederatedCredential
         {
             case GitHubFicEntity.Environment:
                 return $"repo:{Organization}/{Repository}:environment:{Environment}";
-                break;
             case GitHubFicEntity.Branch:
                 return $"repo:{Organization}/{Repository}:ref:refs/heads/{Branch}";
-                break;
             case GitHubFicEntity.PullRequest:
                 return $"repo:{Organization}/{Repository}:pull_request";
             case GitHubFicEntity.Tag:

@@ -1,7 +1,9 @@
-﻿name: Pulumi Preview
+﻿name: Pulumi Infra
 
 on:
-  - pull_request
+  pull_request:
+  push:
+    branches: [ main ]
   
 permissions:
   id-token: write
@@ -13,10 +15,14 @@ jobs:
   preview:
     name: Preview
     runs-on: ubuntu-latest
-    environment: infra
+    environment: ${{ github.event_name == 'pull_request' && 'preview' || 'infra' }}
     env:
       WORK_DIR: ./src/BadBort.AzureRm.Foundation.Infra
+      PULUMI_STACK: adi-tenant
     steps:
+      - run: |
+          echo "backend container name: ${{vars.BACKEND_CONTAINER_NAME}}"
+          
       - uses: actions/checkout@v4
       - uses: actions/setup-dotnet@v4
         with:
@@ -26,20 +32,25 @@ jobs:
         name: Azure OIDC login
         with:
           allow-no-subscriptions: true
-          client-id: ${{ secrets.AZURE_CLIENT_ID }}
-          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }} 
-          
-      - name: Pulumi login to azblob backend (Tenant A)
-        run: pulumi login "azblob://${{ env.BACKEND_CONTAINER_NAME }}?storage_account=${{ env.BACKEND_STORAGE_ACCOUNT }}"
-        working-directory: ${{ env.WORK_DIR }}
+          client-id: ${{ vars.AZURE_CLIENT_ID }}
+          tenant-id: ${{ vars.AZURE_TENANT_ID }}
+          subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }} 
           
       - uses: pulumi/actions@v6
         with:
-          command: preview
-          stack-name: az-subscription-foundations
+          command: ${{ github.event_name == 'pull_request' && 'preview' || 'up' }}
+          work-dir: ${{ env.WORK_DIR }}
+          stack-name: ${{ env.PULUMI_STACK }}
+          cloud-url: azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}
+          secrets-provider: azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
+          config-map: |
+            data_dir: 
+              value: ${{ github.workspace }}/data
+            tenant: 
+              value: adi
           comment-on-pr: true
-#          cloud-url: azblob://my-blob-name-and-path
-        #env:
-          #PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
-          #PULUMI_BACKEND_URL: ${{ secrets.PULUMI_BACKEND_URL }}
+          comment-on-summary: true
+          diff: true
+          upsert: true
+        env:
+          PULUMI_CONFIG_PASSPHRASE: ${{ env.PULUMI_CONFIG_PASSPHRASE }}

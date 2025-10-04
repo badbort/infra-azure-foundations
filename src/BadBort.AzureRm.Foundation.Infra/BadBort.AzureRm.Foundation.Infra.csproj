@@ -10,7 +10,7 @@
 
     <ItemGroup>
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
-        <PackageReference Include="Pulumi.Azure" Version="6.26.0" />
+        <PackageReference Include="Pulumi.Azure" Version="6.28.0" />
         <PackageReference Include="Pulumi.AzureAD" Version="6.6.0" />
         <PackageReference Include="YamlDotNet" Version="16.3.0" />
     </ItemGroup>

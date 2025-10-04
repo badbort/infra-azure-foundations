@@ -72,7 +72,7 @@ public static class YamlUtility
         return deserializer.Deserialize<T>(yaml);
     }
 
-    public static T Deserialize<T>(
+    public static T? Deserialize<T>(
         Stream input,
         Action<DeserializerBuilder>? configure = null,
         bool ignoreUnmatchedProperties = true,
@@ -108,7 +108,7 @@ public static class YamlUtility
         await File.WriteAllTextAsync(path, text, encoding, cancellationToken).ConfigureAwait(false);
     }
 
-    public static async Task<T> DeserializeFromFileAsync<T>(
+    public static async Task<T?> DeserializeFromFileAsync<T>(
         string path,
         Action<DeserializerBuilder>? configure = null,
         bool ignoreUnmatchedProperties = true,

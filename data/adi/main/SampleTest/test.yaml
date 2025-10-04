@@ -4,6 +4,11 @@
     
     user_assigned_identities:
       - name: uami-sample-app
+            
+      - name: github-actions-testasdfasdfasdf
+        managed_idenity_operators:
+          - service_principal: uami-sample-app
+            description: Needed to assign roles to a UAMI that exists in another resource group
         federated_credentials:
           - name: github-badbort-sample-app-main-fic
             type: github
@@ -13,7 +18,7 @@
             branch: main
     
     role_assignments:
-      - service_principle: uami-sample-app
+      - service_principal: uami-sample-app
         roles:
           - Key Vault Secrets User      
     

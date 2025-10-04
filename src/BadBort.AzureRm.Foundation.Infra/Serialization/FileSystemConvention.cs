@@ -15,11 +15,21 @@ public class FileSystemConvention
     
     public string GetRootConfigFile() => Path.Combine(Root.FullName, TenantsFile);
 
-    public string GetTenantDirectory(string tenantAlias) => Path.Combine(Root.FullName, tenantAlias);
-
-    public string GetSubscriptionDirectory(string tenantAlias, string subscriptionAlias) => Path.Combine(Root.FullName, tenantAlias, subscriptionAlias);
+    public string GetTenantDirectory(string tenantAlias) => GetTenantDirectory(Root.FullName, tenantAlias);
     
-    public string GetResourceGroupDirectory(string tenantAlias, string subscriptionAlias, string subPath) => Path.Combine(Root.FullName, tenantAlias, subscriptionAlias, subPath);
+    public static string GetTenantDirectory(string dataDir, string tenantAlias) => Path.Combine(dataDir, tenantAlias);
+
+    public string GetSubscriptionDirectory(string tenantAlias, string subscriptionAlias) => GetSubscriptionDirectory(Root.FullName, tenantAlias, subscriptionAlias);
+    
+    public static string GetSubscriptionDirectory(string dataDir, string tenantAlias, string subscriptionAlias) => Path.Combine(dataDir, tenantAlias, subscriptionAlias);
+    
+    public static string GetResourceGroupDirectory(string dataDir, string tenantAlias, string subscriptionAlias, string? subPath = null)
+    {
+        if (subPath == null)
+            return Path.Combine(dataDir, tenantAlias, subscriptionAlias);
+        
+        return Path.Combine(dataDir, tenantAlias, subscriptionAlias, subPath);
+    }
 
     public List<TenantInfo> GetTenants()
     {
@@ -32,7 +42,7 @@ public class FileSystemConvention
 
         var rootCfg = YamlUtility.DeserializeFromFile<RootConfigFile>(cfgFilePath);
 
-        if (rootCfg.TenantAliases == null)
+        if (rootCfg?.TenantAliases == null)
             return tenants;
 
         foreach (var (tenantAlias, tid) in rootCfg.TenantAliases)
@@ -45,6 +55,9 @@ public class FileSystemConvention
 
             var tenantCfg = YamlUtility.DeserializeFromFile<TenantConfigFile>(tenantInfoPath);
 
+            if (tenantCfg == null)
+                continue;
+            
             var tenantInfo = new TenantInfo
             {
                 Alias = tenantAlias,
@@ -90,8 +103,9 @@ public class FileSystemConvention
                     continue;
                 }
                 
-                subscriptionInfo.Resources.Add(new SubscriptionResourceInfo
+                subscriptionInfo.Resources.Add(new SubscriptionResourcesInfo
                 {
+                    File = resourceFile,
                     Directory = Path.GetDirectoryName(resourceFile)!,
                     Config = resourceCfg,
                     Category = Path.GetRelativePath(subDir, parentDir!),
@@ -120,14 +134,18 @@ public record SubscriptionInfo
     public required string Id { get; init; }
     public required string Directory { get; init; }
     public required TenantInfo TenantInfo { get; init; }
-    public List<SubscriptionResourceInfo> Resources { get; } = new();
+    
+    /// <summary>
+    /// Many yaml files can be found under a subscription directory. Each file is represented as one <see cref="SubscriptionResourcesInfo"/>
+    /// </summary>
+    public List<SubscriptionResourcesInfo> Resources { get; } = new();
 }
 
-public record SubscriptionResourceInfo
+public record SubscriptionResourcesInfo
 {
     public required string? Category { get; init; }
     public required SubscriptionConfigFile Config { get; init; }
+    public required string File { get; init; }
     public required string Directory { get; init; }
-
     public required SubscriptionInfo SubscriptionInfo { get; init; }
 }

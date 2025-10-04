@@ -10,7 +10,7 @@ public class TenantConfigFile
 public class AdTenantConfig
 {
     /// <summary>
-    /// Map of azure subscription ids to an alias
+    /// Map of azure subscription aliases to ids
     /// </summary>
     [Required]
     public Dictionary<string, string>? SubscriptionAliases { get; set; }

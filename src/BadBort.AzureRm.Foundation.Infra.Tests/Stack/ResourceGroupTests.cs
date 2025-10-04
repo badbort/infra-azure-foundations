@@ -1,4 +1,5 @@
 ﻿using System.Collections.Immutable;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 using BadBort.AzureRm.Foundation.Infra.Tests.Utility;
 using Pulumi;
@@ -8,12 +9,13 @@ using Shouldly;
 
 namespace BadBort.AzureRm.Foundation.Infra.Tests.Stack;
 
+[SuppressMessage("Usage", "xUnit1051:Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken")]
 public class ResourceGroupTests
 {
     [Fact]
     public async Task Deploy_WithSingleResourceGroup()
     {
-        using var temp = new TempData();
+        using var temp = new FileSystemConventionBuilder();
         temp.WriteTenantAndSubscription(
             tenantAlias: "sample-tenant",
             tenantId: "aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee",
@@ -29,7 +31,6 @@ resource_groups:
         {
             ["project:data_dir"] = temp.Root,
             ["project:tenant"] = "sample-tenant",
-            ["project:subscription"] = "sample-sub"
         };
         
         var envJson = JsonSerializer.Serialize(cfg);
@@ -43,5 +44,37 @@ resource_groups:
 
         (await rg.Name.GetValueAsync()).ShouldBe("rg-sample");
         (await rg.Location.GetValueAsync()).ShouldBe("Australia East");
+    }
+
+    [Fact]
+    public async Task Deploy_WithMultipleResourceGroups()
+    {
+        string yaml = @"
+resource_groups:
+  sample-test1:
+    location: Australia East
+    
+  sample-test2:
+    location: Australia South East";
+
+        using var temp = new FileSystemConventionBuilder()
+            .SetupRandomTenantAndSubscription()
+            .SetupResources(subPath: "test", yamlContent: yaml)
+            .Build()
+            .SetPulumiConfig();
+        
+        ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
+        resources.ShouldNotBeEmpty();
+
+        var resourceGroups = resources.OfType<ResourceGroup>().ToList();
+        resourceGroups.Count.ShouldBe(2);
+
+        (await Output.All(resourceGroups.Select(rg => rg.Name)).GetValueAsync()).ShouldBe(["sample-test1", "sample-test2"], ignoreOrder: true);
+
+        var rg1 = resourceGroups.Single(rg => rg.GetResourceName().EndsWith("sample-test1")).ShouldNotBeNull();
+        var rg2 = resourceGroups.Single(rg => rg.GetResourceName().EndsWith("sample-test2")).ShouldNotBeNull();
+        
+        (await rg1.Location.GetValueAsync()).ShouldBe("Australia East");
+        (await rg2.Location.GetValueAsync()).ShouldBe("Australia South East");
     }
 }
