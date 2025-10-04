@@ -24,26 +24,3 @@
     
     tags:
       TestTag: Hey!
-      
-  sample-test-2: &rg
-    location: Australia East
-  sample-test-3: 
-    <<: *rg
-  sample-test-4: 
-    <<: *rg
-  sample-test-5: 
-    <<: *rg
-  sample-test-6: 
-    <<: *rg
-  sample-test-7: 
-    <<: *rg
-  sample-test-8: 
-    <<: *rg
-  sample-test-9: 
-    <<: *rg
-  sample-test-10: 
-    <<: *rg
-  sample-test-11: 
-    <<: *rg
-  sample-test-12: 
-    <<: *rg
