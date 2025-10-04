@@ -93,8 +93,9 @@ public class FileSystemConvention
                     continue;
                 }
                 
-                subscriptionInfo.Resources.Add(new SubscriptionResourceInfo
+                subscriptionInfo.Resources.Add(new SubscriptionResourcesInfo
                 {
+                    File = resourceFile,
                     Directory = Path.GetDirectoryName(resourceFile)!,
                     Config = resourceCfg,
                     Category = Path.GetRelativePath(subDir, parentDir!),
@@ -123,14 +124,18 @@ public record SubscriptionInfo
     public required string Id { get; init; }
     public required string Directory { get; init; }
     public required TenantInfo TenantInfo { get; init; }
-    public List<SubscriptionResourceInfo> Resources { get; } = new();
+    
+    /// <summary>
+    /// Many yaml files can be found under a subscription directory. Each file is represented as one <see cref="SubscriptionResourcesInfo"/>
+    /// </summary>
+    public List<SubscriptionResourcesInfo> Resources { get; } = new();
 }
 
-public record SubscriptionResourceInfo
+public record SubscriptionResourcesInfo
 {
     public required string? Category { get; init; }
     public required SubscriptionConfigFile Config { get; init; }
+    public required string File { get; init; }
     public required string Directory { get; init; }
-
     public required SubscriptionInfo SubscriptionInfo { get; init; }
 }

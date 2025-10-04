@@ -1,15 +1,22 @@
-﻿using BadBort.AzureRm.Foundation.Infra.Serialization;
+﻿using BadBort.AzureRm.Foundation.Infra.Model;
+using BadBort.AzureRm.Foundation.Infra.Serialization;
 using Pulumi;
-using Pulumi.Azure;
 using Pulumi.Azure.ArmMsi;
 using Pulumi.Azure.Authorization;
 using Pulumi.Azure.Core;
+using Pulumi.AzureAD;
 using Config = Pulumi.Config;
+using Provider = Pulumi.Azure.Provider;
+using ProviderArgs = Pulumi.Azure.ProviderArgs;
+using RoleAssignment = BadBort.AzureRm.Foundation.Infra.Model.RoleAssignment;
 
 namespace BadBort.AzureRm.Foundation.Infra;
 
 public class SubscriptionStack : Stack
 {
+    private readonly Dictionary<string, UserAssignedIdentity> _uamiLookup = new(StringComparer.InvariantCultureIgnoreCase);
+    private readonly Dictionary<RgContext, ResourceGroup> _resourceGroups = new();
+
     public SubscriptionStack()
     {
         var config = new Config();
@@ -27,111 +34,224 @@ public class SubscriptionStack : Stack
         {
             throw new InvalidOperationException("Could not find tenant in data_dir");
         }
-        
-        var subscriptions = dirContext.GetSubscriptions(tenantInfo);
 
+        var subscriptions = dirContext.GetSubscriptions(tenantInfo);
         Log.Info($"Executing for subscription {tenantInfo.Id} with alias {tenantInfo.Alias} with {subscriptions.Count} subscriptions");
 
-        var uamiByName = new Dictionary<string, UserAssignedIdentity>();
+        var subscriptionProviders = subscriptions.ToDictionary(s => s, s => new Provider($"az-{s.Id}", new ProviderArgs
+        {
+            SubscriptionId = s.Id,
+        }));
 
+        // Resource groups and UAMIs first
         foreach (SubscriptionInfo subscriptionInfo in subscriptions)
         {
-            if (subscriptionInfo == null)
-            {
-                throw new InvalidOperationException("Could not find subscription dir in specified tenant");
-            }
+            Subscription(subscriptionInfo, subscriptionProviders[subscriptionInfo]);
+        }
 
-            Log.Info($"Executing for subscription {subscriptionInfo.Id} with alias {subscriptionInfo.Alias}");
+        // Role assignments after all identities have been declared
+        foreach (SubscriptionInfo subscriptionInfo in subscriptions)
+        {
+            SubscriptionRoleAssignments(subscriptionInfo, subscriptionProviders[subscriptionInfo]);
+        }
+    }
 
-            var provider = new Provider($"az-{subscriptionInfo.Id}", new ProviderArgs
-            {
-                SubscriptionId = subscriptionInfo.Id,
-            });
+    private void Subscription(SubscriptionInfo subscriptionInfo, Provider azureProvider)
+    {
+        Log.Info($"Executing for subscription {subscriptionInfo.Id} with alias {subscriptionInfo.Alias}");
 
-            foreach (var resourceInfo in subscriptionInfo.Resources)
+        foreach (var resourceInfo in subscriptionInfo.Resources)
+        {
+            foreach (var (resourceGroupName, resourceGroupConfig) in resourceInfo.Config.ResourceGroups ?? new())
             {
-                foreach (var (resourceGroupName, resourceGroupConfig) in resourceInfo.Config.ResourceGroups ?? new())
+                var rg = new ResourceGroup(resourceGroupName, new ResourceGroupArgs
                 {
-                    var rg = new ResourceGroup(resourceGroupName, new ResourceGroupArgs
+                    Name = resourceGroupName,
+                    Location = resourceGroupConfig.Location!,
+                    Tags = resourceGroupConfig.Tags ?? new InputMap<string>() // if your model includes Tags
+                }, new CustomResourceOptions
+                {
+                    Provider = azureProvider
+                });
+
+                _resourceGroups[new(subscriptionInfo, resourceGroupName)] = rg;
+
+
+                foreach (var userAssignedIdentity in resourceGroupConfig.UserAssignedIdentities ?? new())
+                {
+                    ArgumentException.ThrowIfNullOrWhiteSpace(userAssignedIdentity.Name);
+
+                    var uami = new UserAssignedIdentity(userAssignedIdentity.Name, new UserAssignedIdentityArgs
                     {
-                        Name = resourceGroupName,
-                        Location = resourceGroupConfig.Location!,
-                        Tags = resourceGroupConfig.Tags ?? new InputMap<string>() // if your model includes Tags
+                        ResourceGroupName = rg.Name,
+                        Name = userAssignedIdentity.Name,
+                        Location = rg.Location,
+                        Tags = resourceGroupConfig.Tags ?? new InputMap<string>()
                     }, new CustomResourceOptions
                     {
-                        Provider = provider
+                        Parent = rg
                     });
 
-                    // Create azure resource group
-                    // Include resourceGroupConfig.Tags and resourceGroupConfig.Location
+                    Log.Info("Creating user assigned identity: " + userAssignedIdentity.Name);
+                    
+                    _uamiLookup.Add(userAssignedIdentity.Name, uami);
 
-                    var resourceOptions = new CustomResourceOptions
+                    foreach (var federatedCredentialRaw in userAssignedIdentity.FederatedCredentials ?? new())
                     {
-                        Parent = rg
-                    };
+                        var federatedCredential = federatedCredentialRaw.GetPopulatedInstance();
 
-                    foreach (var userAssignedIdentity in resourceGroupConfig.UserAssignedIdentities ?? new())
-                    {
-                        // Create a user assigned identity with name userAssignedIdentity.Name
-                        // add the uami resource to a string dictionary lookup, as role assignments across resource groups and subscriptions may assign roles to these uamis 
-                        var uami = new UserAssignedIdentity(userAssignedIdentity.Name!, new UserAssignedIdentityArgs
-                        {
-                            ResourceGroupName = rg.Name,
-                            Name = userAssignedIdentity.Name!,
-                            Location = rg.Location,
-                            Tags = resourceGroupConfig.Tags ?? new InputMap<string>()
-                        }, resourceOptions);
-
-                        uamiByName[userAssignedIdentity.Name!] = uami;
-
-                        foreach (var federatedCredentialRaw in userAssignedIdentity.FederatedCredentials ?? new())
-                        {
-                            // Support for polymorphism
-                            var federatedCredential = federatedCredentialRaw.GetPopulatedInstance();
-
-                            // Create federated credentials
-                            // federatedCredential.Name
-                            // federatedCredential.Issuer
-                            // federatedCredential.Type
-                            // federatedCredential.SubjectIdentifier
-
-                            _ = new FederatedIdentityCredential(federatedCredential.Name!,
-                                new FederatedIdentityCredentialArgs
-                                {
-                                    ResourceGroupName = rg.Name,
-                                    ParentId = uami.Id,
-                                    Name = uami.Name,
-                                    Issuer = federatedCredential.Issuer!,
-                                    Subject = federatedCredential.SubjectIdentifier!,
-                                    Audience = federatedCredential.Issuer ?? "api://AzureADTokenExchange"
-                                }, new CustomResourceOptions { Provider = provider, Parent = uami });
-                        }
-                    }
-                }
-            }
-
-            // Perform role assignments after all uami resources have been created
-            // Assignments may be either a group or a service principle. See: rgRoleAssignments.Group or rgRoleAssignments.ServicePrinciple
-            // If a UAMI was not created, we want to do a data lookup on the service principle
-            foreach (var resourceInfo in subscriptionInfo.Resources)
-            {
-                foreach (var (_, resourceGroupConfig) in resourceInfo.Config.ResourceGroups ?? new())
-                {
-                    foreach (var rgRoleAssignments in resourceGroupConfig.RoleAssignments ?? new())
-                    {
-                        foreach (string role in rgRoleAssignments.Roles ?? new())
-                        {
-                        }
-                    }
-                }
-
-                foreach (var subscriptionRoleAssignments in resourceInfo.Config.RoleAssignments ?? new())
-                {
-                    foreach (string role in subscriptionRoleAssignments.Roles ?? new())
-                    {
+                        _ = new FederatedIdentityCredential(federatedCredential.Name!,
+                            new FederatedIdentityCredentialArgs
+                            {
+                                ResourceGroupName = rg.Name,
+                                ParentId = uami.Id,
+                                Name = uami.Name,
+                                Issuer = federatedCredential.Issuer!,
+                                Subject = federatedCredential.SubjectIdentifier!,
+                                Audience = federatedCredential.Issuer ?? "api://AzureADTokenExchange"
+                            }, new CustomResourceOptions
+                            {
+                                Provider = azureProvider,
+                                Parent = uami
+                            });
                     }
                 }
             }
         }
     }
+
+    /// <summary>
+    /// Add all the role assignments within the subscription.
+    /// </summary>
+    private void SubscriptionRoleAssignments(SubscriptionInfo subscriptionInfo, Provider azureProvider)
+    {
+        foreach (SubscriptionResourcesInfo resourceInfo in subscriptionInfo.Resources)
+        {
+            foreach (var (resourceGroupName, resourceGroupConfig) in resourceInfo.Config.ResourceGroups ?? new())
+            {
+                // Resource group role assignments
+                if (!_resourceGroups.TryGetValue(new RgContext(subscriptionInfo, resourceGroupName), out ResourceGroup? resourceGroup))
+                {
+                    throw new NullReferenceException("Could not find resource group");
+                }
+
+                foreach (RoleAssignment assignment in resourceGroupConfig.RoleAssignments ?? new())
+                {
+                    RoleAssignment(assignment, "rg-" + resourceGroupName, resourceGroup.Id, resourceGroup, azureProvider);
+                }
+
+                foreach (UserAssignedIdentifyConfig uamiConfig in resourceGroupConfig.UserAssignedIdentities ?? new())
+                {
+                    if (string.IsNullOrWhiteSpace(uamiConfig.Name))
+                        continue;
+
+                    var uamiResource = _uamiLookup[uamiConfig.Name];
+
+                    foreach (var roleAssignment in uamiConfig.ManagedIdentityOperators ?? new())
+                    {
+                        var identityInfo = roleAssignment.GetIdentityInfo();
+
+                        // Only support service principals for now
+                        if (identityInfo == null || string.IsNullOrEmpty(roleAssignment.ServicePrincipal))
+                        {
+                            continue;
+                        }
+
+                        var principalId = GetServicePrincipleId(roleAssignment.ServicePrincipal);
+
+                        _ = new Assignment(
+                            name: $"ra-uami-{identityInfo.IdentityType}-{identityInfo.Name}-managed-identity-operator".ToLower(),
+                            new AssignmentArgs
+                            {
+                                PrincipalId = principalId,
+                                RoleDefinitionName = "Managed Identity Operator",
+                                Scope = uamiResource.Id,
+#pragma warning disable CS8604 // Possible null reference argument.
+                                Description = roleAssignment.Description
+#pragma warning restore CS8604 // Possible null reference argument.
+                            },
+                            new CustomResourceOptions
+                            {
+                                Provider = azureProvider,
+                                Parent = uamiResource
+                            });
+                    }
+                }
+            }
+
+            // Subscription level role assignments
+            foreach (RoleAssignment assignment in resourceInfo.Config.RoleAssignments ?? new())
+            {
+                RoleAssignment(assignment, "subscription-" + subscriptionInfo.Alias, subscriptionInfo.Id, null, azureProvider);
+            }
+        }
+    }
+
+    private void RoleAssignment(RoleAssignment assignment, string scopeName, Input<string> scope, Resource? parentResource, Provider provider)
+    {
+        Output<string>? principalId = null;
+
+        var identityInfo = assignment.GetIdentityInfo();
+
+        if (identityInfo == null)
+        {
+            return;
+        }
+
+        if (assignment.ServicePrinciple != null)
+        {
+            principalId = GetServicePrincipleId(assignment.ServicePrinciple);
+        }
+        else if (assignment.Group != null)
+        {
+            var group = GetGroup.Invoke(new GetGroupInvokeArgs
+            {
+                DisplayName = assignment.Group
+            });
+
+            principalId = group.Apply(o => o.Id);
+        }
+
+        if (principalId == null)
+        {
+            throw new InvalidOperationException("Could not find identity to perform role assignment");
+        }
+
+        foreach (string role in assignment.Roles ?? new())
+        {
+            _ = new Assignment(
+                name: $"ra-{scopeName}-{identityInfo.IdentityType}-{identityInfo.Name}-{role}".ToLower(),
+                new AssignmentArgs
+                {
+                    PrincipalId = principalId,
+                    RoleDefinitionName = role,
+                    Scope = scope,
+#pragma warning disable CS8604 // Possible null reference argument.
+                    Description = assignment.Description
+#pragma warning restore CS8604 // Possible null reference argument.
+                },
+                new CustomResourceOptions
+                {
+                    Provider = provider,
+                    Parent = parentResource
+                });
+        }
+    }
+
+    private Output<string> GetServicePrincipleId(string servicePrincipalName)
+    {
+        if (_uamiLookup.TryGetValue(servicePrincipalName, out var userAssignedIdentity))
+        {
+            return userAssignedIdentity.PrincipalId;
+        }
+
+        var sp = GetServicePrincipal.Invoke(new GetServicePrincipalInvokeArgs
+        {
+            DisplayName = servicePrincipalName
+        });
+
+        return sp.Apply(o => o.ObjectId);
+    }
+
+    record RgContext(SubscriptionInfo SubscriptionAlias, string ResourceGroup);
 }
