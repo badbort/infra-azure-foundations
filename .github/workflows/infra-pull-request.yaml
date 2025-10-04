@@ -38,7 +38,12 @@ jobs:
         with:
           command: preview
           stack-name: az-subscription-foundations
+          config-map: |
+            data_dir: data
+            tenant: adi
+            
           comment-on-pr: true
+          comment-on-summary: trur
 #          cloud-url: azblob://my-blob-name-and-path
         #env:
           #PULUMI_ACCESS_TOKEN: ${{ secrets.PULUMI_ACCESS_TOKEN }}
