@@ -71,8 +71,8 @@ resource_groups:
 
         (await Output.All(resourceGroups.Select(rg => rg.Name)).GetValueAsync()).ShouldBe(["sample-test1", "sample-test2"], ignoreOrder: true);
 
-        var rg1 = resourceGroups.Single(rg => rg.GetResourceName() == "sample-test1").ShouldNotBeNull();
-        var rg2 = resourceGroups.Single(rg => rg.GetResourceName() == "sample-test2").ShouldNotBeNull();
+        var rg1 = resourceGroups.Single(rg => rg.GetResourceName().EndsWith("sample-test1")).ShouldNotBeNull();
+        var rg2 = resourceGroups.Single(rg => rg.GetResourceName().EndsWith("sample-test2")).ShouldNotBeNull();
         
         (await rg1.Location.GetValueAsync()).ShouldBe("Australia East");
         (await rg2.Location.GetValueAsync()).ShouldBe("Australia South East");
