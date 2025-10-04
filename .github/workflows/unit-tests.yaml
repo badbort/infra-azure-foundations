@@ -46,7 +46,7 @@ jobs:
         run: dotnet build --no-build --no-restore -c Debug
 
       - name: dotnet test with coverage
-        run: dotnet test './src/MyProj.sln' --logger trx --configuration Release
+        run: dotnet test 'src/BadBort.AzureRm.Foundation.sln' --logger trx --configuration Release
 
       - name: Process trx reports with default
         if: always()
