@@ -6,7 +6,7 @@ public class FileSystemConvention
 {
     public const string TenantsFile = "tenants.yaml";
 
-    public DirectoryInfo Root { get; }
+    private DirectoryInfo Root { get; }
 
     public FileSystemConvention(string rootDirectory)
     {
@@ -120,7 +120,7 @@ public class FileSystemConvention
     }
 }
 
-public record TenantInfo
+public class TenantInfo
 {
     public required string Alias { get; init; }
     public required string Id { get; init; }
@@ -128,7 +128,7 @@ public record TenantInfo
     public required string Directory { get; init; }
 }
 
-public record SubscriptionInfo
+public class SubscriptionInfo
 {
     public required string Alias { get; init; }
     public required string Id { get; init; }
@@ -141,7 +141,7 @@ public record SubscriptionInfo
     public List<SubscriptionResourcesInfo> Resources { get; } = new();
 }
 
-public record SubscriptionResourcesInfo
+public class SubscriptionResourcesInfo
 {
     public required string? Category { get; init; }
     public required SubscriptionConfigFile Config { get; init; }

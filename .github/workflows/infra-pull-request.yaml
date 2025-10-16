@@ -52,5 +52,3 @@ jobs:
           comment-on-summary: true
           diff: true
           upsert: true
-        env:
-          PULUMI_CONFIG_PASSPHRASE: ${{ env.PULUMI_CONFIG_PASSPHRASE }}
