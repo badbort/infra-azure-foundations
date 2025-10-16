@@ -9,6 +9,11 @@ on:
       - "**/*.sln"
   push:
     branches: [ main ]
+    paths:
+      - "src/**"
+      - "tests/**"
+      - "**/*.csproj"
+      - "**/*.sln"
 
 permissions:
   contents: read
