@@ -12,8 +12,8 @@ permissions:
   pull-requests: write
 
 jobs:
-  preview:
-    name: Preview
+  pulumi:
+    name: Pulumi ${{ github.event_name == 'pull_request' && 'preview' || 'up' }}
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'pull_request' && 'preview' || 'infra' }}
     env:
