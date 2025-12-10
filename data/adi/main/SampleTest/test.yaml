@@ -19,6 +19,7 @@
     
     role_assignments:
       - service_principal: uami-sample-app
+        description: Sample app performs yada yada yada
         roles:
           - Key Vault Secrets User      
     
