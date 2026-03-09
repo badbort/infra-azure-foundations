@@ -16,8 +16,16 @@
             organization: racwasandbox
             repository: hackathon-spec-driven
             environment: infra
+      - name: id-hackathon-2026-main
     role_assignments:
       - service_principal: github-actions-hackathon-spec-driven
         roles:
           - Contributor
           - User Access Administrator
+      - service_principal: id-hackathon-2026-main
+        roles:
+          - Service Bus Data Owner
+          - Storage Blob Data Owner
+          - Storage Table Data Owner
+          - Storage Queue Data Owner
+          - Key Vault Secrets User
