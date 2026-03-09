@@ -2,7 +2,20 @@
   hackathon-2026:
     location: Australia East
     user_assigned_identities:
-      - name: github-actions-hackathon-spec-driven    
+      - name: github-actions-hackathon-spec-driven
+        federated_credentials:
+          - name: gh-branch-main-fic
+            type: github
+            entity: Branch
+            organization: racwasandbox
+            repository: hackathon-spec-driven
+            branch: main
+          - name: gh-env-plan-fic
+            type: github
+            entity: Branch
+            organization: racwasandbox
+            repository: hackathon-spec-driven
+            environment: plan
     role_assignments:
       - service_principal: github-actions-hackathon-spec-driven
         roles:
