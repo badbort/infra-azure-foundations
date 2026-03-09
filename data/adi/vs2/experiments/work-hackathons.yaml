@@ -10,12 +10,12 @@
             organization: racwasandbox
             repository: hackathon-spec-driven
             branch: main
-          - name: gh-env-plan-fic
+          - name: gh-env-infra-fic
             type: github
             entity: Branch
             organization: racwasandbox
             repository: hackathon-spec-driven
-            environment: plan
+            environment: infra
     role_assignments:
       - service_principal: github-actions-hackathon-spec-driven
         roles:
