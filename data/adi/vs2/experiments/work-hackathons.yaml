@@ -12,7 +12,7 @@
             branch: main
           - name: gh-env-infra-fic
             type: github
-            entity: Branch
+            entity: Environment
             organization: racwasandbox
             repository: hackathon-spec-driven
             environment: infra
