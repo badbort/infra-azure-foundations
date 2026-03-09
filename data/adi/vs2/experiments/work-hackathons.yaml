@@ -1,0 +1,10 @@
+﻿resource_groups:
+  hackathon-2026:
+    location: Australia East
+    user_assigned_identities:
+      - name: github-actions-hackathon-spec-driven    
+    role_assignments:
+      - service_principal: github-actions-hackathon-spec-driven
+        roles:
+          - Contributor
+          - User Access Administrator
