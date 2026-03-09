@@ -27,3 +27,5 @@
           - Azure Service Bus Data Owner
           - Storage Blob Data Owner
           - Key Vault Secrets User
+          - Storage Table Data Contributor
+
