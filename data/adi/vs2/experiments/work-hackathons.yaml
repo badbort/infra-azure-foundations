@@ -17,7 +17,16 @@
             repository: hackathon-spec-driven
             environment: infra
       - name: id-hackathon-2026-main
+      
     role_assignments:
+      - group: Me
+        roles:
+          - Contributor
+          - Azure Service Bus Data Owner
+          - Key Vault Secrets Officer
+          - User Access Administrator
+          - Storage Blob Data Owner
+          - Storage Table Data Contributor
       - service_principal: github-actions-hackathon-spec-driven
         roles:
           - Contributor
