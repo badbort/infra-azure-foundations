@@ -222,7 +222,7 @@ public class SubscriptionStack : Stack
                 DisplayName = assignment.Group
             });
 
-            principalId = group.Apply(o => o.Id);
+            principalId = group.Apply(o => o.ObjectId);
         }
 
         if (principalId == null)
