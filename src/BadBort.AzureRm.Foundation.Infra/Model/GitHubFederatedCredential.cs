@@ -25,6 +25,7 @@ public class GitHubFederatedCredential : FederatedCredential
         {
             Name = Name,
             Issuer = "https://token.actions.githubusercontent.com",
+            Audience = "api://AzureADTokenExchange",
             SubjectIdentifier = GetSubjectIssuer(),
             Type = Type
         };

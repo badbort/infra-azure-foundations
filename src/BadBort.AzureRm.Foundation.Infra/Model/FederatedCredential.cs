@@ -1,4 +1,5 @@
 using BadBort.AzureRm.Foundation.Infra.Serialization;
+using Pulumi;
 
 namespace BadBort.AzureRm.Foundation.Infra.Model;
 
@@ -12,6 +13,8 @@ public class FederatedCredential : IPolymorphicType
     
     public string? SubjectIdentifier { get; set; }
     
+    public string? Audience { get; set; }
+
     public static Dictionary<string, Type> GetTypes()
     {
         return new ()

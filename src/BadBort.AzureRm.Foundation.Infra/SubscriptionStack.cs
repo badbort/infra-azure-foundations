@@ -121,7 +121,7 @@ public class SubscriptionStack : Stack
                                 Name = federatedCredential.Name!,
                                 Issuer = federatedCredential.Issuer!,
                                 Subject = federatedCredential.SubjectIdentifier!,
-                                Audience = federatedCredential.Issuer ?? "api://AzureADTokenExchange"
+                                Audience = federatedCredential.Audience ?? "api://AzureADTokenExchange"
                             }, new CustomResourceOptions
                             {
                                 Provider = azureProvider,
