@@ -9,7 +9,6 @@ using Pulumi.AzureAD;
 using Config = Pulumi.Config;
 using Provider = Pulumi.Azure.Provider;
 using ProviderArgs = Pulumi.Azure.ProviderArgs;
-using RoleAssignment = BadBort.AzureRm.Foundation.Infra.Model.RoleAssignment;
 
 namespace BadBort.AzureRm.Foundation.Infra;
 
@@ -86,7 +85,7 @@ public class SubscriptionStack : Stack
                 }, new CustomResourceOptions
                 {
                     Provider = azureProvider,
-                    Parent = azureProvider
+                    Parent = azureProvider,
                 });
 
                 _resourceGroups[new(subscriptionInfo, resourceGroupName)] = rg;
@@ -119,7 +118,7 @@ public class SubscriptionStack : Stack
                             {
                                 ResourceGroupName = rg.Name,
                                 ParentId = uami.Id,
-                                Name = uami.Name,
+                                Name = federatedCredential.Name!,
                                 Issuer = federatedCredential.Issuer!,
                                 Subject = federatedCredential.SubjectIdentifier!,
                                 Audience = federatedCredential.Issuer ?? "api://AzureADTokenExchange"
