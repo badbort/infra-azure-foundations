@@ -24,8 +24,6 @@
           - User Access Administrator
       - service_principal: id-hackathon-2026-main
         roles:
-          - Service Bus Data Owner
+          - Azure Service Bus Data Owner
           - Storage Blob Data Owner
-          - Storage Table Data Owner
-          - Storage Queue Data Owner
           - Key Vault Secrets User
