@@ -17,6 +17,14 @@
             repository: hackathon-spec-driven
             environment: infra
       - name: id-hackathon-2026-main
+      - name: github-actions-hackathon-spec-driven-integration-tests
+        federated_credentials:
+          - name: gh-branch-main-fic
+            type: github
+            entity: Branch
+            organization: racwasandbox
+            repository: hackathon-spec-driven
+            branch: main
       
     role_assignments:
       - group: Me
@@ -25,8 +33,10 @@
           - Azure Service Bus Data Owner
           - Key Vault Secrets Officer
           - User Access Administrator
+          - Storage Account Contributor
           - Storage Blob Data Owner
           - Storage Table Data Contributor
+          - Storage Queue Data Contributor
       - service_principal: github-actions-hackathon-spec-driven
         roles:
           - Contributor
@@ -37,4 +47,5 @@
           - Storage Blob Data Owner
           - Key Vault Secrets User
           - Storage Table Data Contributor
-
+          - Storage Queue Data Contributor
+          - Storage Account Contributor
