@@ -57,5 +57,6 @@ jobs:
               value: adi
           comment-on-pr: true
           comment-on-summary: true
+          always-include-summary: true
           diff: true
           upsert: true
