@@ -43,7 +43,22 @@ jobs:
           tenant-id: ${{ vars.AZURE_TENANT_ID }}
           subscription-id: ${{ vars.AZURE_SUBSCRIPTION_ID }} 
           
-      - uses: pulumi/actions@v6
+      - name: Pulumi refresh
+        uses: pulumi/actions@v6
+        with:
+          command: refresh
+          work-dir: ${{ env.WORK_DIR }}
+          stack-name: ${{ env.PULUMI_STACK }}
+          cloud-url: azblob://${{vars.BACKEND_CONTAINER_NAME }}?storage_account=${{vars.BACKEND_STORAGE_ACCOUNT }}
+          secrets-provider: azurekeyvault://kv-badbort-pulumi-pw.vault.azure.net/keys/infra-azure-foundations-stack-adi-tenant
+          config-map: |
+            data_dir: 
+              value: ${{ github.workspace }}/data
+            tenant: 
+              value: adi
+
+      - name: Pulumi deploy
+        uses: pulumi/actions@v6
         with:
           command: ${{ github.event_name == 'pull_request' && 'preview' || 'up' }}
           work-dir: ${{ env.WORK_DIR }}
@@ -59,5 +74,4 @@ jobs:
           comment-on-summary: true
           always-include-summary: true
           diff: true
-          refresh: true
           upsert: true
