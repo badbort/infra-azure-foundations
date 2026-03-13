@@ -14,4 +14,9 @@ public class AdTenantConfig
     /// </summary>
     [Required]
     public Dictionary<string, string>? SubscriptionAliases { get; set; }
+    
+    /// <summary>
+    /// Optional map of alias to Entra user identifier (object id or user principal name).
+    /// </summary>
+    public Dictionary<string, string>? UserAliases { get; set; }
 }

@@ -24,7 +24,60 @@ public class ResourceGroupConfig
     
     public List<RoleAssignment>? RoleAssignments { get; set; }
     
+    /// <summary>
+    /// Resource-group scoped cost budgets and alert notifications.
+    /// </summary>
+    public List<ResourceGroupBudgetConfig>? Budgets { get; set; }
+    
     public Dictionary<string,string>? Tags { get; set; }
+}
+
+[UsedImplicitly]
+public class ResourceGroupBudgetConfig
+{
+    [Required]
+    public string? Name { get; set; }
+    
+    [Required]
+    public decimal? Amount { get; set; }
+    
+    /// <summary>
+    /// Default time grain is Monthly.
+    /// </summary>
+    public string? TimeGrain { get; set; }
+    
+    [Required]
+    public string? StartDate { get; set; }
+    
+    public string? EndDate { get; set; }
+
+    public List<BudgetNotificationConfig>? Notifications { get; set; }
+}
+
+[UsedImplicitly]
+public class BudgetNotificationConfig
+{
+    [Required]
+    public string? Name { get; set; }
+    
+    [Required]
+    public decimal? ThresholdPercent { get; set; }
+    
+    public bool? Enabled { get; set; }
+    
+    public string? Operator { get; set; }
+    
+    public List<string>? ContactEmails { get; set; }
+    
+    /// <summary>
+    /// Azure action group resource IDs.
+    /// </summary>
+    public List<string>? ContactGroups { get; set; }
+    
+    /// <summary>
+    /// User references that resolve to email: object id (GUID), user principal name, or tenant user alias.
+    /// </summary>
+    public List<string>? ContactUsers { get; set; }
 }
 
 [UsedImplicitly]
