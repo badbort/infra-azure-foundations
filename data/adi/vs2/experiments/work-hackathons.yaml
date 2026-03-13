@@ -37,10 +37,6 @@
           - Storage Blob Data Owner
           - Storage Table Data Contributor
           - Storage Queue Data Contributor
-      - service_principal: github-actions-hackathon-spec-driven-integration-tests
-        description: Seems to need reader to see subscription for azure/login action
-        roles:
-          - Reader
       - service_principal: github-actions-hackathon-spec-driven
         roles:
           - Contributor
