@@ -4,5 +4,4 @@ tenant:
     vs1: c57064af-5c01-47d7-ae4f-b9828410a148
     vs2: 8d3156a0-c58b-45d7-b51d-dfe7c115273c
   user_aliases:
-    finops-lead: 11111111-2222-3333-4444-555555555555
-    engineering-manager: eng.manager@contoso.example
+    me: 5b7e73a8-ae54-46ef-a687-b34345720e61
