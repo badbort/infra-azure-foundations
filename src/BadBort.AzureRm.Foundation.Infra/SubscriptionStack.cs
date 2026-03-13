@@ -113,7 +113,7 @@ public class SubscriptionStack : Stack
                     {
                         var federatedCredential = federatedCredentialRaw.GetPopulatedInstance();
 
-                        _ = new FederatedIdentityCredential($"{uami.Name}-{federatedCredential.Name!}",
+                        _ = new FederatedIdentityCredential($"{userAssignedIdentity.Name}-{federatedCredential.Name!}",
                             new FederatedIdentityCredentialArgs
                             {
                                 ResourceGroupName = rg.Name,
