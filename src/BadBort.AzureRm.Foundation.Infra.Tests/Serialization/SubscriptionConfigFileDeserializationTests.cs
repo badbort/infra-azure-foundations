@@ -172,4 +172,44 @@ resource_groups:
             Repository = "testrepo"
         });
     }
+
+    [Fact]
+    public void ResourceGroup_WithBudgets_DeserializesBudgetNotifications()
+    {
+        const string yaml = @"
+resource_groups:
+  rg-app:
+    location: Australia East
+    budgets:
+      - name: rg-app-monthly
+        amount: 250
+        time_grain: Monthly
+        start_date: 2026-01-01T00:00:00Z
+        notifications:
+          - name: warn-80
+            threshold_percent: 80
+            contact_emails:
+              - finops@example.com
+            contact_users:
+              - finops-lead
+              - 11111111-2222-3333-4444-555555555555
+";
+        var cfg = YamlUtility.Deserialize<SubscriptionConfigFile>(yaml);
+        cfg.ShouldNotBeNull();
+        cfg.ResourceGroups.ShouldNotBeNull();
+
+        var budget = cfg.ResourceGroups["rg-app"].Budgets.ShouldNotBeNull().ShouldHaveSingleItem();
+        budget.Name.ShouldBe("rg-app-monthly");
+        budget.Amount.ShouldBe(250);
+        budget.TimeGrain.ShouldBe("Monthly");
+        budget.StartDate.ShouldBe("2026-01-01T00:00:00Z");
+
+        var notification = budget.Notifications.ShouldNotBeNull().ShouldHaveSingleItem();
+        notification.Name.ShouldBe("warn-80");
+        notification.ThresholdPercent.ShouldBe(80);
+        notification.ContactEmails.ShouldNotBeNull().ShouldContain("finops@example.com");
+        notification.ContactUsers.ShouldNotBeNull();
+        notification.ContactUsers.ShouldContain("finops-lead");
+        notification.ContactUsers.ShouldContain("11111111-2222-3333-4444-555555555555");
+    }
 }
