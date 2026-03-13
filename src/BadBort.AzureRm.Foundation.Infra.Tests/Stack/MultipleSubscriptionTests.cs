@@ -10,6 +10,12 @@ namespace BadBort.AzureRm.Foundation.Infra.Tests.Stack;
 
 public class MultipleSubscriptionTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public MultipleSubscriptionTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
     
     [Fact]
     public async Task Deploy_WithMultipleResourceGroups()
@@ -34,6 +40,7 @@ resource_groups:
         
         ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         resources.ShouldNotBeEmpty();
+        await _output.WritePreviewSummaryAsync(resources);
 
         var azureProviders = resources.OfType<Provider>().ToList();
         azureProviders.Count.ShouldBe(2);

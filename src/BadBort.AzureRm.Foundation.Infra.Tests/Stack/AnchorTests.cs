@@ -12,6 +12,12 @@ namespace BadBort.AzureRm.Foundation.Infra.Tests.Stack;
 
 public class AnchorTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public AnchorTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
     
     [Fact]
     public async Task Deploy_WithMultipleResourceGroups()
@@ -35,6 +41,7 @@ resource_groups:
         
         ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         resources.ShouldNotBeEmpty();
+        await _output.WritePreviewSummaryAsync(resources);
 
         var resourceGroups = resources.OfType<ResourceGroup>().ToList();
         resourceGroups.Count.ShouldBe(2);

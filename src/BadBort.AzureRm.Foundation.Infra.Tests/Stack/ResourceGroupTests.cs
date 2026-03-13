@@ -12,6 +12,13 @@ namespace BadBort.AzureRm.Foundation.Infra.Tests.Stack;
 [SuppressMessage("Usage", "xUnit1051:Calls to methods which accept CancellationToken should use TestContext.Current.CancellationToken")]
 public class ResourceGroupTests
 {
+    private readonly ITestOutputHelper _output;
+
+    public ResourceGroupTests(ITestOutputHelper output)
+    {
+        _output = output;
+    }
+
     [Fact]
     public async Task Deploy_WithSingleResourceGroup()
     {
@@ -39,6 +46,7 @@ resource_groups:
         ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         
         resources.ShouldNotBeEmpty();
+        await _output.WritePreviewSummaryAsync(resources);
         
         var rg = resources.OfType<ResourceGroup>().ShouldHaveSingleItem();
 
@@ -65,6 +73,7 @@ resource_groups:
         
         ImmutableArray<Resource> resources = await Deployment.TestAsync<SubscriptionStack>(new EmptyMocks());
         resources.ShouldNotBeEmpty();
+        await _output.WritePreviewSummaryAsync(resources);
 
         var resourceGroups = resources.OfType<ResourceGroup>().ToList();
         resourceGroups.Count.ShouldBe(2);
