@@ -59,4 +59,5 @@ jobs:
           comment-on-summary: true
           always-include-summary: true
           diff: true
+          refresh: true
           upsert: true
